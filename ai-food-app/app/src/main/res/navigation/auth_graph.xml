@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_graph"
+    app:startDestination="@id/auth_login">
+
+    <fragment
+        android:id="@+id/auth_login"
+        android:name="com.ai.food.recognition.presentation.auth.LoginFragment"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_auth_login_to_auth_register"
+            app:destination="@id/auth_register" />
+        <action
+            android:id="@+id/action_auth_login_to_auth_forgot_password"
+            app:destination="@id/auth_forgot_password" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/auth_register"
+        android:name="com.ai.food.recognition.presentation.auth.RegisterFragment"
+        tools:layout="@layout/fragment_register" />
+
+    <fragment
+        android:id="@+id/auth_forgot_password"
+        android:name="com.ai.food.recognition.presentation.auth.ForgotPasswordFragment"
+        tools:layout="@layout/fragment_forgot_password" />
+</navigation>

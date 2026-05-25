@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Base_project_kotlin_mvvm_koin_offline" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.AIFood" parent="Base.Theme.Base_project_kotlin_mvvm_koin_offline" />
+
+    <style name="Theme.MyApp.Splash" parent="Theme.SplashScreen">
+
+        <!-- Background -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Logo -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_ai_food</item>
+        
+        <item name="splashScreenIconSize">@dimen/_20sdp</item>
+
+        <!-- Duration (optional) -->
+        <item name="windowSplashScreenAnimationDuration">3000</item>
+
+        <!-- Sau splash sẽ chuyển sang theme này -->
+        <item name="postSplashScreenTheme">@style/Theme.AIFood</item>
+
+    </style>
+</resources>
