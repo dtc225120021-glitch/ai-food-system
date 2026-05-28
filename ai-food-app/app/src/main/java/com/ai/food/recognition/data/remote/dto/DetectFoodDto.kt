@@ -64,3 +64,15 @@ data class ConfirmedFoodData(
     @SerializedName("foods") val foods: List<FoodItem>?
 )
 
+data class FoodResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("data") val data: List<FoodLogItem>?
+)
+
+data class FoodLogItem(
+    @SerializedName("_id") val id: String?,
+    @SerializedName("image") val image: String?,
+    @SerializedName("category") val category: String?,
+    @SerializedName("foods") val foods: List<FoodItem>?,
+    @SerializedName("createdAt") val createdAt: String?
+)

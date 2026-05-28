@@ -45,6 +45,36 @@ exports.confirmFood = async (req, res) => {
 
         const savedFood = await foodLog.save();
 
+        // Đồng bộ cập nhật bảng DailyReport (bảng csdl của user cho ngày hiện tại)
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalFat = 0;
+        let totalCarbs = 0;
+
+        foods.forEach(food => {
+            totalCalories += Number(food.calories) || 0;
+            totalProtein += Number(food.protein) || 0;
+            totalFat += Number(food.fat) || 0;
+            totalCarbs += Number(food.carbs) || 0;
+        });
+
+        const DailyReport = require("../models/DailyReport");
+        const tzOffset = 7 * 60 * 60 * 1000;
+        const dateString = new Date(Date.now() + tzOffset).toISOString().split("T")[0];
+
+        await DailyReport.findOneAndUpdate(
+            { userId: userId, date: dateString },
+            {
+                $inc: {
+                    consumedCalories: totalCalories,
+                    consumedProtein: totalProtein,
+                    consumedFat: totalFat,
+                    consumedCarbs: totalCarbs
+                }
+            },
+            { new: true, upsert: true }
+        );
+
         return res.status(201).json({
             success: true,
             message: "Xác nhận thực phẩm thành công.",
@@ -68,6 +98,8 @@ exports.confirmFood = async (req, res) => {
 exports.getFoods = async (req, res) => {
     try {
         const userId = req.user.userId;
+        const { date } = req.query;
+
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -75,7 +107,18 @@ exports.getFoods = async (req, res) => {
             });
         }
 
-        const foods = await Food.find({ createBy: userId }).sort({ createdAt: -1 });
+        let query = { createBy: userId };
+
+        if (date) {
+            const startOfDay = new Date(`${date}T00:00:00.000+07:00`);
+            const endOfDay = new Date(`${date}T23:59:59.999+07:00`);
+            query.createdAt = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
+        }
+
+        const foods = await Food.find(query).sort({ createdAt: -1 });
 
         return res.json({
             success: true,

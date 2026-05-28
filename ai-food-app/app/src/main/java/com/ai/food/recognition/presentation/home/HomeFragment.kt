@@ -4,15 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.ImageLoader
 import com.ai.food.recognition.R
 import com.ai.food.recognition.base.BaseFragment
 import com.ai.food.recognition.data.SessionManager
+import com.ai.food.recognition.data.remote.AuthApi
 import com.ai.food.recognition.data.remote.dto.UserProfile
 import com.ai.food.recognition.databinding.FragmentHomeBinding
 import com.ai.food.recognition.ext.loadImage
@@ -23,13 +26,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.getValue
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val imageLoader: ImageLoader by inject()
+    private val authApi: AuthApi by inject()
     private val mainViewModel: MainViewModel by activityViewModel()
+    
+    private lateinit var homeFoodAdapter: HomeFoodAdapter
 
     override fun inflateBinding(layoutInflater: LayoutInflater, container: ViewGroup?) =
         FragmentHomeBinding.inflate(layoutInflater, container, false)
@@ -47,7 +55,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     override fun initializeViews() {
+        homeFoodAdapter = HomeFoodAdapter(imageLoader) {
+            // Handle food click if necessary
+        }
+
         withBinding(binding) {
+            rvRecentFood.layoutManager = LinearLayoutManager(requireContext())
+            rvRecentFood.adapter = homeFoodAdapter
+
             // Setup click listeners for target goals configuration
             cardConfigure.setOnClickListener {
                 startActivity(Intent(requireContext(), UserConfigActivity::class.java))
@@ -108,6 +123,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onResume() {
         super.onResume()
         renderProfile()
+        fetchRecentFoods()
+    }
+
+    private fun fetchRecentFoods() {
+        lifecycleScope.launch {
+            try {
+                val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val todayString = formatter.format(Date())
+                
+                val response = authApi.getFoods(date = todayString)
+                if (response.isSuccessful) {
+                    val foodList = response.body()?.data ?: emptyList()
+                    homeFoodAdapter.submitList(foodList)
+                    
+                    withBinding(binding) {
+                        layoutNoItem.isVisible = foodList.isEmpty()
+                        rvRecentFood.isVisible = foodList.isNotEmpty()
+                    }
+                } else {
+                    withBinding(binding) {
+                        layoutNoItem.isVisible = true
+                        rvRecentFood.isVisible = false
+                    }
+                }
+            } catch (e: Exception) {
+                withBinding(binding) {
+                    layoutNoItem.isVisible = true
+                    rvRecentFood.isVisible = false
+                }
+                e.printStackTrace()
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -135,8 +182,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         withBinding(binding) {
-            layoutNoItem.isVisible = true
-
             val totalConsumed = SessionManager.consumedCalories
             val consumedProtein = SessionManager.consumedProteins
             val consumedFat = SessionManager.consumedFats

@@ -17,6 +17,7 @@ import com.ai.food.recognition.data.remote.dto.SetupConfigResponse
 import com.ai.food.recognition.data.remote.dto.UpdateProfileRequest
 import com.ai.food.recognition.data.remote.dto.ConfirmFoodRequest
 import com.ai.food.recognition.data.remote.dto.ConfirmFoodResponse
+import com.ai.food.recognition.data.remote.dto.FoodResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -24,6 +25,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Multipart
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface AuthApi {
 
@@ -70,6 +72,11 @@ interface AuthApi {
     suspend fun confirmFood(
         @Body request: ConfirmFoodRequest
     ): Response<ConfirmFoodResponse>
+
+    @GET("foods")
+    suspend fun getFoods(
+        @Query("date") date: String? = null
+    ): Response<FoodResponse>
 }
 
 
