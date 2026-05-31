@@ -59,7 +59,7 @@ class HomeFoodAdapter(
             } else {
                 "${SessionManager.BASE_URL}$imageUrl"
             }
-            binding.ivFood.loadImage(fullImageUrl, imageLoader)
+            binding.ivFood.loadImage(fullImageUrl, imageLoader = imageLoader)
 
             binding.root.setOnClickListener {
                 onItemClick(item)

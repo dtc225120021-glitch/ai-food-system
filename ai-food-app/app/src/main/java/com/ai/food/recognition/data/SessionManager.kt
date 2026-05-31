@@ -2,7 +2,7 @@ package com.ai.food.recognition.data
 
 object SessionManager {
 
-    const val BASE_URL = "http://192.168.1.2:3000/"
+    const val BASE_URL = "http://192.168.1.14:3000/"
 
     var email: String? = null
     var password: String? = null

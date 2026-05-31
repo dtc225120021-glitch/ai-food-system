@@ -253,7 +253,7 @@
         android:background="@drawable/bg_shape_corner_20"
         android:fontFamily="@font/inter_18pt_bold"
         android:includeFontPadding="false"
-        android:text="ĐĂNG NHẬP"
+        android:text="ĐĂNG KÝ"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
